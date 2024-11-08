@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 import CalculateButton from './CalculateButton';
+import SplashScreen from 'react-native-splash-screen';
 
 const Calculator = () => {
   const { width, height } = useWindowDimensions();
@@ -8,6 +9,11 @@ const Calculator = () => {
 
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+  
 
   const handlePress = (value) => {
     if (value === 'AC') {
