@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import CalculateButton from './CalculateButton';
 import SplashScreen from 'react-native-splash-screen';
 
@@ -9,76 +9,112 @@ const Calculator = () => {
 
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
+  const [isResultDisplayed, setIsResultDisplayed] = useState(false);
 
   useEffect(() => {
     SplashScreen.hide();
   }, []);
-  
 
-  const handlePress = (value) => {
+  const handlePress = (value: string) => {
     if (value === 'AC') {
       setInput('');
       setResult('');
-    } else if (['+', '-', '×', '÷'].includes(value)) {
-      setInput((prev) => prev + ` ${value} `);
+      setIsResultDisplayed(false);
+    } else if (['+', '-', '×', '÷', '%', '√'].includes(value)) {
+      // If a result is already displayed, use it as the starting point for the next calculation
+      if (isResultDisplayed) {
+        setInput(result + ` ${value} `);
+        setIsResultDisplayed(false);
+      } else {
+        setInput((prev) => prev + ` ${value} `);
+      }
     } else if (value === '=') {
       calculateResult();
     } else if (value === ',' || value === '.') {
       setInput((prev) => (prev.includes('.') ? prev : prev + '.'));
-    } else if (['x²', 'x³', 'xʸ', 'eˣ', '10ˣ', '1/x', '²√x', '³√x', 'ln', 'log₁₀', 'x!'].includes(value)) {
-      horizontalCalculate(value);
+    } else if (['x²', 'x³', 'eˣ', '10ˣ', '1/x', '²√x', '³√x', 'ln', 'log₁₀', 'x!', 'sin', 'cos', 'tan'].includes(value)) {
+      scientificCalculate(value);
     } else {
-      setInput((prev) => prev + value);
+      if (isResultDisplayed) {
+        setInput(value);
+        setIsResultDisplayed(false);
+      } else {
+        setInput((prev) => prev + value);
+      }
     }
   };
 
-  const horizontalCalculate = (func) => {
+  const calculateResult = () => {
+    try {
+      let formattedEquation = input
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/√/g, 'Math.sqrt')
+        .replace(/π/g, 'Math.PI')
+        .replace(/e/g, 'Math.E');
+
+      const finalResult = eval(formattedEquation).toString();
+      setResult(finalResult);
+      setInput(finalResult);
+      setIsResultDisplayed(true);
+    } catch (error) {
+      setResult('Error');
+    }
+  };
+
+  const scientificCalculate = (func: string) => {
     let x = parseFloat(input);
-    let result;
+    let calcResult = '';
 
     switch (func) {
       case 'x²':
-        result = (x ** 2).toString();
+        calcResult = (x ** 2).toString();
         break;
       case 'x³':
-        result = (x ** 3).toString();
+        calcResult = (x ** 3).toString();
         break;
-      case 'xʸ':
-        setInput(input + ' ^ ');
-        return;
       case 'eˣ':
-        result = Math.exp(x).toString();
+        calcResult = Math.exp(x).toString();
         break;
       case '10ˣ':
-        result = (10 ** x).toString();
+        calcResult = (10 ** x).toString();
         break;
       case '1/x':
-        result = x !== 0 ? (1 / x).toString() : 'Error';
+        calcResult = x !== 0 ? (1 / x).toString() : 'Error';
         break;
       case '²√x':
-        result = Math.sqrt(x).toString();
+        calcResult = Math.sqrt(x).toString();
         break;
       case '³√x':
-        result = Math.cbrt(x).toString();
+        calcResult = Math.cbrt(x).toString();
         break;
       case 'ln':
-        result = x > 0 ? Math.log(x).toString() : 'Error';
+        calcResult = x > 0 ? Math.log(x).toString() : 'Error';
         break;
       case 'log₁₀':
-        result = x > 0 ? Math.log10(x).toString() : 'Error';
+        calcResult = x > 0 ? Math.log10(x).toString() : 'Error';
         break;
       case 'x!':
-        result = factorial(x).toString();
+        calcResult = factorial(x).toString();
+        break;
+      case 'sin':
+        calcResult = trigValue('sin', x);
+        break;
+      case 'cos':
+        calcResult = trigValue('cos', x);
+        break;
+      case 'tan':
+        calcResult = trigValue('tan', x);
         break;
       default:
         return;
-
     }
-    setResult(result);
+
+    setResult(calcResult);
     setInput('');
   };
 
-  const factorial = (n) => {
+  const factorial = (n: number) => {
     if (n < 0) return 'Error';
     if (n === 0 || n === 1) return 1;
     let result = 1;
@@ -88,15 +124,27 @@ const Calculator = () => {
     return result;
   };
 
+  const trigValue = (func: string, angle: number) => {
+    const angleMap = {
+      30: { sin: '1/2', cos: '√3/2', tan: '1/√3' },
+      45: { sin: '√2/2', cos: '√2/2', tan: '1' },
+      60: { sin: '√3/2', cos: '1/2', tan: '√3' },
+    };
 
-  const calculateResult = () => {
-    try {
-      let formattedEquation = input.replace(/×/g, '*').replace(/÷/g, '/');
-      const finalResult = eval(formattedEquation).toString();
-      setResult(finalResult);
-      setInput('');
-    } catch (error) {
-      setResult('Error');
+    if (angleMap[angle]) {
+      return angleMap[angle][func];
+    }
+    
+    const radians = (angle * Math.PI) / 180;
+    switch (func) {
+      case 'sin':
+        return Math.sin(radians).toString();
+      case 'cos':
+        return Math.cos(radians).toString();
+      case 'tan':
+        return Math.tan(radians).toString();
+      default:
+        return 'Error';
     }
   };
 
@@ -112,82 +160,126 @@ const Calculator = () => {
   );
 };
 
-const renderPortraitButtons = (handlePress) => {
-  const buttons = [
-    ['AC', '÷'],
-    ['7', '8', '9', '×'],
-    ['4', '5', '6', '-'],
-    ['1', '2', '3', '+'],
-    ['0', ',', '='],
+const renderPortraitButtons = (handlePress: { (value: string): void; (arg0: string): any; }) => {
+  const rowsPortrait = [
+    [
+      { title: 'AC', backgroundColor: '#636466', color: '#e8e9ea', style: styles.acButton },
+      { title: '÷', backgroundColor: '#ff9a00', color: '#e8e9ea', style: styles.divideButton },
+    ],
+    [
+      { title: '7', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '8', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '9', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '×', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: '4', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '5', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '6', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '-', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: '1', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '2', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '3', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '+', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: '0', backgroundColor: '#636466', color: '#e8e9ea', style: styles.zeroButton },
+      { title: ',', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '=', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
   ];
 
-  return buttons.map((row, rowIndex) => (
+  return rowsPortrait.map((row, rowIndex) => (
     <View key={rowIndex} style={styles.row}>
       {row.map((button, buttonIndex) => (
         <CalculateButton
           key={buttonIndex}
-          label={button}
-          onPress={handlePress}
-          style={[
-            styles.buttonPortrait,
-            button === '0' ? styles.zeroButton : null,
-            isOperator(button) ? styles.operatorButton : null,
-            button === 'AC' ? styles.acButton : null,
-          ]}
-          textStyle={styles.buttonText}
+          label={button.title}
+          onPress={() => handlePress(button.title)}
+          style={[styles.buttonPortrait, { backgroundColor: button.backgroundColor }, button.style || null]}
+          textStyle={{ color: button.color }}
         />
       ))}
     </View>
   ));
 };
 
-const renderLandscapeButtons = (handlePress) => {
-  const buttons = [
-    ['(', ')', 'mc', 'm+', 'm-', 'mr', 'AC', '÷'],
-    ['2ⁿᵈ', 'x²', 'x³', 'xʸ', 'eˣ', '10ˣ', '7', '8', '9', '×'],
-    ['1/x', '²√x', '³√x', 'ʸ√x', 'ln', 'log₁₀', '4', '5', '6', '-'],
-    ['x!', 'sin', 'cos', 'tan', 'e', 'EE', '1', '2', '3', '+'],
-    ['Rad', 'sinh', 'cosh', 'tanh', 'π', 'Rand', '0', ',', '='],
+const renderLandscapeButtons = (handlePress: { (value: string): void; (arg0: string): any; }) => {
+  const rowsLandscape = [
+    [
+      { title: '(', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: ')', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'mc', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'm+', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'm-', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'mr', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'AC', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '÷', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: '2ⁿᵈ', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'x²', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'x³', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'xʸ', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'eˣ', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '10ˣ', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '7', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '8', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '9', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '×', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: '1/x', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '²√x', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '³√x', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'ʸ√x', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'ln', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'log₁₀', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '4', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '5', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '6', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '-', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: 'x!', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'sin', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'cos', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'tan', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'e', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'EE', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '1', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '2', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '3', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '+', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
+    [
+      { title: 'Rad', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'sinh', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'cosh', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'tanh', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'π', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: 'Rand', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '0', backgroundColor: '#636466', color: '#e8e9ea', style: styles.zeroButton },
+      { title: ',', backgroundColor: '#636466', color: '#e8e9ea' },
+      { title: '=', backgroundColor: '#ff9a00', color: '#e8e9ea' },
+    ],
   ];
 
-  return buttons.map((row, rowIndex) => (
+  return rowsLandscape.map((row, rowIndex) => (
     <View key={rowIndex} style={styles.row}>
       {row.map((button, buttonIndex) => (
         <CalculateButton
           key={buttonIndex}
-          label={button}
-          onPress={handlePress}
-          style={[
-            styles.buttonLandscape,
-            button === '0' ? styles.zeroButton : null,
-            isOperator(button) ? styles.operatorButton : null,
-            isFunction(button) || isMemoryFunction(button) ? styles.functionButton : null,
-            button === 'AC' ? styles.acButton : null,
-          ]}
-          textStyle={
-            isFunction(button) || isMemoryFunction(button)
-              ? styles.smallButtonText
-              : styles.buttonText
-          }
+          label={button.title}
+          onPress={() => handlePress(button.title)}
+          style={[styles.buttonLandscape, { backgroundColor: button.backgroundColor }, button.style || null]}
+          textStyle={{ color: button.color }}
         />
       ))}
     </View>
   ));
-};
-
-const isMemoryFunction = (button) => {
-  return ['(', ')', 'mc', 'm+', 'm-', 'mr'].includes(button);
-};
-
-const isFunction = (button) => {
-  return [
-    '2ⁿᵈ', 'x²', 'x³', 'xʸ', 'eˣ', '10ˣ', '1/x', '²√x', '³√x', 'ʸ√x', 'ln', 'log₁₀',
-    'x!', 'sin', 'cos', 'tan', 'e', 'EE', 'Rad', 'sinh', 'cosh', 'tanh', 'π', 'Rand'
-  ].includes(button);
-};
-
-const isOperator = (button) => {
-  return ['÷', '×', '-', '+', '='].includes(button);
 };
 
 const styles = StyleSheet.create({
@@ -234,33 +326,15 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 5,
   },
-  buttonText: {
-    fontSize: 20,
-    color: '#ffffff',
+  divideButton: {
+    flex: 1,
+  },
+
+  acButton: {
+    flex: 3.1,
   },
   zeroButton: {
-    flex: 2.2,
-  },
-  operatorButton: {
-    backgroundColor: '#ffa500',
-  },
-  acButton: {
-    backgroundColor: '#505050',
-    flex: 3.3,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 4,
-    borderRadius: 5,
-  },
-  functionButton: {
-    backgroundColor: '#424242',
-    height: 50,
-    width: 50,
-    margin: 4,
-  },
-  smallButtonText: {
-    fontSize: 15,
-    color: '#ffffff',
+    flex: 2.1,
   },
 });
 

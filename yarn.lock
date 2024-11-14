@@ -3821,6 +3821,11 @@ makeerror@1.0.12:
 marky@^1.2.2:
   version "1.2.5"
 
+math-expression-evaluator@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.npmjs.org/math-expression-evaluator/-/math-expression-evaluator-2.0.5.tgz"
+  integrity sha512-C8Ifr3BpZ1E8ncWiHltndUkimvkzBwEiXPRyDJVxspo/G7zSN8tLHwFVfrGotvWzu2wuRkjnxaEayFblepmN5Q==
+
 memoize-one@^5.0.0:
   version "5.2.1"
 
