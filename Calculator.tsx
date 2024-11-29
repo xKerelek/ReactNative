@@ -21,7 +21,6 @@ const Calculator = () => {
       setResult('');
       setIsResultDisplayed(false);
     } else if (['+', '-', '×', '÷', '%', '√'].includes(value)) {
-      // If a result is already displayed, use it as the starting point for the next calculation
       if (isResultDisplayed) {
         setInput(result + ` ${value} `);
         setIsResultDisplayed(false);
