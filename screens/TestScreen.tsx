@@ -6,7 +6,7 @@ const TestScreen = ({ navigation }: any) => {
       <Text style={styles.title}>Choose your test</Text>
       <TouchableOpacity
         style={styles.testCard}
-        onPress={() => navigation.navigate('TestQuestion', { testId: 1 })}
+        onPress={() => navigation.navigate('TestQuestionScreen', { testId: 1 })}
       >
      <Text style={styles.testTitle}>Title test #1</Text>
         <Text style={styles.testDescription}>Lorem ipsum </Text>
@@ -14,7 +14,7 @@ const TestScreen = ({ navigation }: any) => {
 
       <TouchableOpacity
         style={styles.testCard}
-        onPress={() => navigation.navigate('TestQuestion', { testId: 2 })}
+        onPress={() => navigation.navigate('TestQuestionScreen', { testId: 2 })}
       >
      <Text style={styles.testTitle}>Title test #2</Text>
      <Text style={styles.testDescription}>Lorem ipsum </Text>
@@ -22,7 +22,7 @@ const TestScreen = ({ navigation }: any) => {
 
       <TouchableOpacity
         style={styles.testCard}
-        onPress={() => navigation.navigate('TestQuestion', { testId: 3 })}
+        onPress={() => navigation.navigate('TestQuestionScreen', { testId: 3 })}
       >
      <Text style={styles.testTitle}>Title test #3</Text>
      <Text style={styles.testDescription}>Lorem ipsum </Text>
@@ -30,7 +30,7 @@ const TestScreen = ({ navigation }: any) => {
 
       <TouchableOpacity
         style={styles.testCard}
-        onPress={() => navigation.navigate('TestQuestion', { testId: 4 })}
+        onPress={() => navigation.navigate('TestQuestionsScreen', { testId: 4 })}
       >
      <Text style={styles.testTitle}>Title test #4</Text>
      <Text style={styles.testDescription}>Lorem ipsum </Text>

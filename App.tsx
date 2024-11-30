@@ -7,6 +7,7 @@ import TestScreen from './screens/TestScreen';
 import ResultScreen from './screens/ResultScreen';
 import './gesture-handler';
 import DrawerActivity from './screens/DrawerActivity';
+import TestQuestionScreen from './screens/TestQuestionScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -16,6 +17,7 @@ const DrawerNavigator = () => (
   <Drawer.Screen name="Home" component={HomeScreen} />
   <Drawer.Screen name="Test" component={TestScreen} />
   <Drawer.Screen name="Result" component={ResultScreen} />
+  <Drawer.Screen name="TestQuestionScreen" component={TestQuestionScreen} />
 </Drawer.Navigator>
 );
 
