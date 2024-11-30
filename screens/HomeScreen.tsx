@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, Button, StyleSheet } from 'react-native';
 
 const HomeScreen = ({navigation}: any) => {
@@ -6,10 +5,9 @@ const HomeScreen = ({navigation}: any) => {
         <View style={styles.container}>
             <Text style={styles.title}>Quiz App</Text>
             <Button title="Start Quiz" onPress={() => navigation.navigate('Test')} />
-                <View style={styles.footer}>
-                    <Button title="Result" onPress={() => navigation.navigate('Result')} />
-                </View>
-            
+            <View style={styles.footer}>
+                <Button title="Result" onPress={() => navigation.navigate("Result")} />
+            </View>
         </View>
     );
 }
