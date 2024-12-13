@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    fontFamily: 'Lora',
     marginBottom: 20,
   },
   footer: {

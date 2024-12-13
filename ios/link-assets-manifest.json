@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Lora.ttf",
+      "sha1": "47b78da7542fcf4a27c30fbaaf9234172dfa6f7a"
+    },
+    {
+      "path": "assets/fonts/NunitoSans.ttf",
+      "sha1": "0bc82dfdb6c913d99eedb88d55e5d61b33ecd210"
+    },
+    {
+      "path": "assets/fonts/Playwrite.ttf",
+      "sha1": "a2ff7e2d74a4d2dc6c720b9bf6cff2182fb7ce9b"
+    }
+  ]
+}

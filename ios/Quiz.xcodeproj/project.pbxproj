@@ -14,6 +14,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-Quiz-QuizTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-Quiz-QuizTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		E5C6C4BBC8B645DDB5EC0283 /* Lora.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5DA77E3DFC6B4E6B9CA955BD /* Lora.ttf */; };
+		F1E846F718BC43368AD0AAEA /* NunitoSans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6F590AF94AC448049AB55F74 /* NunitoSans.ttf */; };
+		9B8FDA07A64E40569CF10853 /* Playwrite.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7259C3A0862A45D3A556F4F3 /* Playwrite.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,9 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Quiz/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-Quiz-QuizTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Quiz-QuizTests.release.xcconfig"; path = "Target Support Files/Pods-Quiz-QuizTests/Pods-Quiz-QuizTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		5DA77E3DFC6B4E6B9CA955BD /* Lora.ttf */ = {isa = PBXFileReference; name = "Lora.ttf"; path = "../assets/fonts/Lora.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		6F590AF94AC448049AB55F74 /* NunitoSans.ttf */ = {isa = PBXFileReference; name = "NunitoSans.ttf"; path = "../assets/fonts/NunitoSans.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7259C3A0862A45D3A556F4F3 /* Playwrite.ttf */ = {isa = PBXFileReference; name = "Playwrite.ttf"; path = "../assets/fonts/Playwrite.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +130,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				8A5914CE24BB4FC3B77B9BA7 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -149,6 +156,17 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		8A5914CE24BB4FC3B77B9BA7 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				5DA77E3DFC6B4E6B9CA955BD /* Lora.ttf */,
+				6F590AF94AC448049AB55F74 /* NunitoSans.ttf */,
+				7259C3A0862A45D3A556F4F3 /* Playwrite.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -245,6 +263,9 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				E5C6C4BBC8B645DDB5EC0283 /* Lora.ttf in Resources */,
+				F1E846F718BC43368AD0AAEA /* NunitoSans.ttf in Resources */,
+				9B8FDA07A64E40569CF10853 /* Playwrite.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

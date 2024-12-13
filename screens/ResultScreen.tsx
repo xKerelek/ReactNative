@@ -1,28 +1,33 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 
 const ResultScreen = () => {
   const navigation = useNavigation();
 
-  const [results, setResults] = useState([
-    { nick: "Maciek", score: 18, total: 20, type: "test"},
-    { nick: "Józef", score: 15, total: 20, type: "Gothic"},
-    { nick: "Tomasz", score: 20, total: 20, type: "Wiedźmin"},
-    { nick: "Karol", score: 12, total: 20, type: "ZZZ"},
-  ]);
-
+  const [results, setResults] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  const getPlayerFromAPI = async () => {
+    try {
+      const response = await fetch('https://tgryl.pl/quiz/results?last=20');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setResults(data);
+    } catch (error) {
+      console.error('Error fetching results:', error);
+    }
+  };
+
+  useEffect(() => {
+    getPlayerFromAPI();
+  }, []);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-
-    setTimeout(() => {
-      setResults((prevResults) => [
-        ...prevResults,
-        { nick: "Krystian", score: 14, total: 20, type: "ZZZ"},
-      ]);
-      setRefreshing(false);
-    }, 2000);
+    getPlayerFromAPI().finally(() => setRefreshing(false));
   }, []);
 
   const renderItem = ({ item, index }: any) => (
@@ -42,10 +47,10 @@ const ResultScreen = () => {
         <View>
           <View style={styles.header}>
             <Text style={styles.headerText}>#</Text>
-            <Text style={styles.headerText}>Gracz</Text>
-            <Text style={styles.headerText}>Punkty</Text>
-            <Text style={styles.headerText}>Wszystkie</Text>
-            <Text style={styles.headerText}>Typ</Text>
+            <Text style={styles.headerText}>Player</Text>
+            <Text style={styles.headerText}>Points</Text>
+            <Text style={styles.headerText}>Score</Text>
+            <Text style={styles.headerText}>Type</Text>
           </View>
           <FlatList
             data={results}
