@@ -1,37 +1,58 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 
 const ResultScreen = () => {
-  const resultsData = [
-    { id: 1, playerName: 'Player 1', testNumber: 1, score: 8 },
-    { id: 2, playerName: 'Player 2', testNumber: 2, score: 7 },
-    { id: 3, playerName: 'Player 3', testNumber: 3, score: 9 },
-    { id: 4, playerName: 'Player 4', testNumber: 4, score: 6 },
-  ];
+  const [results, setResults] = useState([
+    { nick: "Maciek", score: 18, total: 20, type: "test"},
+    { nick: "Józef", score: 15, total: 20, type: "Gothic"},
+    { nick: "Tomasz", score: 20, total: 20, type: "Wiedźmin"},
+    { nick: "Karol", score: 12, total: 20, type: "ZZZ"},
+  ]);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setResults((prevResults) => [
+        ...prevResults,
+        { nick: "Krystian", score: 14, total: 20, type: "ZZZ"},
+      ]);
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const renderItem = ({ item, index }: any) => (
     <View style={styles.row}>
       <Text style={styles.cell}>{index + 1}</Text>
-      <Text style={styles.cell}>{item.playerName}</Text>
-      <Text style={styles.cell}>{item.testNumber}</Text>
+      <Text style={styles.cell}>{item.nick}</Text>
       <Text style={styles.cell}>{item.score}</Text>
+      <Text style={styles.cell}>{item.total}</Text>
+      <Text style={styles.cell}>{item.type}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Results</Text>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>#</Text>
-        <Text style={styles.headerText}>Player</Text>
-        <Text style={styles.headerText}>Test</Text>
-        <Text style={styles.headerText}>Score</Text>
-      </View>
-      <FlatList
-        data={resultsData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
+      <ScrollView horizontal>
+        <View>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>#</Text>
+            <Text style={styles.headerText}>Player</Text>
+            <Text style={styles.headerText}>Score</Text>
+            <Text style={styles.headerText}>Total</Text>
+            <Text style={styles.headerText}>Type</Text>
+          </View>
+          <FlatList
+            data={results}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -53,26 +74,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#7C7372',
     paddingVertical: 10,
     marginBottom: 10,
-    justifyContent: 'space-between',
-    borderRadius: 5,
+    justifyContent: 'flex-start',
   },
   headerText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    width: '23%',
+    minWidth: 70,
     textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
     paddingVertical: 10,
-    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
   cell: {
     fontSize: 16,
-    width: '23%',
+    minWidth: 70,
     textAlign: 'center',
   },
 });

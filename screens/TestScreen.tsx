@@ -3,44 +3,35 @@ import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 const TestScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Choose your test</Text>
+      <Text style={styles.title}>Wybierz swój test</Text>
       <TouchableOpacity
         style={styles.testCard}
         onPress={() => navigation.navigate('TestQuestionScreen', { testId: 1 })}
       >
-     <Text style={styles.testTitle}>Title test #1</Text>
-        <Text style={styles.testDescription}>Lorem ipsum </Text>
+     <Text style={styles.testTitle}>Wiedźmin #1</Text>
+        <Text style={styles.testDescription}>Test o potworach w grach </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.testCard}
         onPress={() => navigation.navigate('TestQuestionScreen', { testId: 2 })}
       >
-     <Text style={styles.testTitle}>Title test #2</Text>
-     <Text style={styles.testDescription}>Lorem ipsum </Text>
+     <Text style={styles.testTitle}>Gothic #2</Text>
+     <Text style={styles.testDescription}>Test wiedzy z gry Gothic</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.testCard}
         onPress={() => navigation.navigate('TestQuestionScreen', { testId: 3 })}
       >
-     <Text style={styles.testTitle}>Title test #3</Text>
-     <Text style={styles.testDescription}>Lorem ipsum </Text>
+     <Text style={styles.testTitle}>Zenless Zone Zero #3</Text>
+     <Text style={styles.testDescription}>Test wiedzy z gry Zenless Zone Zero</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.testCard}
-        onPress={() => navigation.navigate('TestQuestionsScreen', { testId: 4 })}
-      >
-     <Text style={styles.testTitle}>Title test #4</Text>
-     <Text style={styles.testDescription}>Lorem ipsum </Text>
-      </TouchableOpacity>
-
       <View style={styles.container}>
         <TouchableOpacity 
             style={styles.resultCard}
             onPress={() => navigation.navigate('Result')}>
-            <Text style={styles.footerText}>Get to know your ranking result</Text>       
+            <Text style={styles.footerText}>Sprawdź swoje wyniki</Text>       
         </TouchableOpacity>
       </View>
     </View>
