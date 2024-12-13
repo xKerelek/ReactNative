@@ -311,7 +311,8 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
         setCurrentIndex(currentIndex + 1);
         setSelectedAnswerIndex(null);
       } else {
-        navigation.navigate("Result");
+        navigation.navigate("Main", { screen: "Result" });
+
       }
     }, 1000);
   };

@@ -1,7 +1,10 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 
 const ResultScreen = () => {
+  const navigation = useNavigation();
+
   const [results, setResults] = useState([
     { nick: "Maciek", score: 18, total: 20, type: "test"},
     { nick: "Józef", score: 15, total: 20, type: "Gothic"},
@@ -34,15 +37,15 @@ const ResultScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Results</Text>
+      <Text style={styles.title}>Wyniki graczy</Text>
       <ScrollView horizontal>
         <View>
           <View style={styles.header}>
             <Text style={styles.headerText}>#</Text>
-            <Text style={styles.headerText}>Player</Text>
-            <Text style={styles.headerText}>Score</Text>
-            <Text style={styles.headerText}>Total</Text>
-            <Text style={styles.headerText}>Type</Text>
+            <Text style={styles.headerText}>Gracz</Text>
+            <Text style={styles.headerText}>Punkty</Text>
+            <Text style={styles.headerText}>Wszystkie</Text>
+            <Text style={styles.headerText}>Typ</Text>
           </View>
           <FlatList
             data={results}
