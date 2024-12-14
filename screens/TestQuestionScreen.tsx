@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert} from 'react-native';
 
 const TestQuestionScreen = ({ route, navigation }: any) => {
   const { testId } = route.params;
@@ -7,6 +7,7 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
 
   
   const getQuestionIDFromAPI = async () => {
@@ -28,14 +29,52 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
     getQuestionIDFromAPI();
   }, [testId]);
 
+  const sendResults = async (score: number, total: number) => {
+    const payload = {
+      nick: "Karol", score, total, type: testDetails.name,
+    };
+    try {
+      const response = await fetch('https://tgryl.pl/quiz/result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        Alert.alert('Sukces', 'Wynik został pomyślnie przesłany!');
+        navigation.navigate("Main", { screen: "Result" });
+      } else {
+        Alert.alert('Błąd', 'Nie udało się przesłać wyniku.');
+      }
+    } catch (error: any) {
+      Alert.alert('Błąd', 'Wystąpił problem z przesłaniem wyniku: ', error);
+    }
+  }
+
   const handleAnswer = (index: number, isCorrect: boolean) => {
     setSelectedAnswerIndex(index);
+    if(isCorrect) {
+      setScore(score + 1);
+    }
+
     setTimeout(() => {
       if (currentIndex < (testDetails.tasks.length - 1)) {
         setCurrentIndex(currentIndex + 1);
         setSelectedAnswerIndex(null);
       } else {
-        navigation.navigate("Main", { screen: "Result" });
+        const finalScore = isCorrect ? score + 1: score;
+        Alert.alert(
+          'Koniec quizu!',
+          `Twój wynik to ${finalScore}/${testDetails.tasks.length}.`,
+          [
+            {
+              text: 'OK',
+              onPress: () => sendResults(finalScore, testDetails.tasks.length),
+            },
+          ]
+        );
       }
     }, 1000);
   };
@@ -124,6 +163,12 @@ const styles = StyleSheet.create({
   },
   wrongAnswer: {
     backgroundColor: 'red',
+  },
+  score: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
+    color: '#333',
   },
 });
 
