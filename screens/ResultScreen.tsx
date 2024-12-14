@@ -1,12 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 
 const ResultScreen = () => {
   const navigation = useNavigation();
 
   const [results, setResults] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState(null);
 
   const getPlayerFromAPI = async () => {
     try {
@@ -30,14 +31,25 @@ const ResultScreen = () => {
     getPlayerFromAPI().finally(() => setRefreshing(false));
   }, []);
 
+  const handleRowPress = (id: any) => {
+    setSelectedPlayerId(selectedPlayerId === id ? null : id); // Toggle visibility
+  };
+
   const renderItem = ({ item, index }: any) => (
-    <View style={styles.row}>
-      <Text style={styles.cell}>{index + 1}</Text>
-      <Text style={styles.cell}>{item.nick}</Text>
-      <Text style={styles.cell}>{item.score}</Text>
-      <Text style={styles.cell}>{item.total}</Text>
-      <Text style={styles.cell}>{item.type}</Text>
-    </View>
+    <>
+      <TouchableOpacity style={styles.row} onPress={() => handleRowPress(item.id)}>
+        <Text style={styles.cell}>{index + 1}</Text>
+        <Text style={styles.cell}>{item.nick}</Text>
+        <Text style={styles.cell}>{item.score}</Text>
+        <Text style={styles.cell}>{item.total}</Text>
+        <Text style={styles.cell}>{item.type}</Text>
+      </TouchableOpacity>
+      {selectedPlayerId === item.id && (
+        <View style={styles.detailRow}>
+          <Text style={styles.detailText}>{item.createdOn}</Text>
+        </View>
+      )}
+    </>
   );
 
   return (
@@ -101,6 +113,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minWidth: 70,
     textAlign: 'center',
+  },
+  detailRow: {
+    backgroundColor: '#f9f9f9',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  detailText: {
+    fontSize: 17,
+    fontFamily: 'NunitoSans',
+    color: '#555',
   },
 });
 
