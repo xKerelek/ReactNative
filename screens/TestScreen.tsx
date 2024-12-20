@@ -82,11 +82,12 @@ const styles = StyleSheet.create({
   },
   testTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: 'NunitoSans',
     marginBottom: 10,
   },
   testDescription: {
     fontSize: 16,
+    fontFamily: 'Playwrite',
     color: '#777',
   },
 });

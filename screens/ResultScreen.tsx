@@ -32,7 +32,7 @@ const ResultScreen = () => {
   }, []);
 
   const handleRowPress = (id: any) => {
-    setSelectedPlayerId(selectedPlayerId === id ? null : id); // Toggle visibility
+    setSelectedPlayerId(selectedPlayerId === id ? null : id);
   };
 
   const renderItem = ({ item, index }: any) => (
