@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert} from 'react-native';
+import _ from 'lodash';
 
 const TestQuestionScreen = ({ route, navigation }: any) => {
   const { testId } = route.params;
@@ -17,6 +18,11 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
+      const shuffledTasks = _.shuffle(data.tasks);
+      shuffledTasks.forEach((taks: any) => {
+        taks.answer = _.shuffle(taks.answer);
+      })
+      data.tasks = shuffledTasks;
       setTestDetails(data);
     } catch (error) {
       console.error('Error fetching test details:', error);

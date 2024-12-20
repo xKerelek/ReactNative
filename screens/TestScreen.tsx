@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import _ from 'lodash';
 
 const TestScreen = ({ navigation }: any) => {
   const [tests, setTests] = useState<any[]>([]);
@@ -12,7 +13,7 @@ const TestScreen = ({ navigation }: any) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setTests(data);
+      setTests(_.shuffle);
     } catch (error) {
       console.error('Error fetching tests:', error);
     } finally {

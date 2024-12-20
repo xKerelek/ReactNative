@@ -1,6 +1,7 @@
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { StyleSheet, View, Text, Image, Alert, Button } from "react-native";
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import _ from 'lodash';
 
 
 const Drawer = createDrawerNavigator();
@@ -9,8 +10,9 @@ const Drawer = createDrawerNavigator();
         try {
             const response = await fetch('https://tgryl.pl/quiz/tests');
             const tests = await response.json();
-            if(tests.length > 0) {
-                const randomTest = tests[Math.floor(Math.random() * tests.length)];
+            const shuffledTest = _.shuffle(tests);
+            if(shuffledTest.length > 0) {
+                const randomTest = shuffledTest[0];
                 props.navigation.navigate('TestQuestionScreen', {testId: randomTest.id})
             } else {
                 Alert.alert('Brak testów');
