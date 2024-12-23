@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
+import { initializeDatabase } from './database';
+import { fetchAndStoreTests } from './fetchAndStoreTest';
 import HomeScreen from './screens/HomeScreen';
 import TestScreen from './screens/TestScreen';
 import ResultScreen from './screens/ResultScreen';
@@ -31,35 +33,43 @@ const App = () => {
   const [hasShowScreen, setShowScreen] = useState(false);
 
   useEffect(() => {
-    const checkAccepted = async () => {
+    const initApp = async () => {
       try {
+        await AsyncStorage.removeItem('lastFetchDate'); // Wymuś ponowne pobranie
+        await initializeDatabase();
+        await fetchAndStoreTests();
+        console.log('App initialization completed.');
         const accepted = await AsyncStorage.getItem('hasAccept');
-        if(accepted === 'true') {
+        if (accepted === 'true') {
           setAccept(true);
         } else {
           setShowScreen(true);
         }
-      } catch(error) {
-        console.error('Error with AsyncStorage: ', error);
+      } catch (error) {
+        console.error('Error during app initialization:', error);
+      } finally {
+        setIsLoading(false);
+        SplashScreen.hide();
       }
-      setTimeout(() => setIsLoading(false), 2000);
-      SplashScreen.hide();
     };
-    checkAccepted();
+
+    initApp();
   }, []);
 
-  const handleAccept = async() => {
+  const handleAccept = async () => {
     try {
       await AsyncStorage.setItem('hasAccept', 'true');
       setShowScreen(false);
       setAccept(true);
-    } catch(error) {
-      console.error('Error saving AsyncStorage: ', error);
+    } catch (error) {
+      console.error('Error saving AsyncStorage:', error);
     }
   };
 
   if (isLoading) return null;
-  if (hasShowScreen) { return <WelcomeScreen onFinish={handleAccept} />}
+  if (hasShowScreen) {
+    return <WelcomeScreen onFinish={handleAccept} />;
+  }
 
   return (
     <NavigationContainer>

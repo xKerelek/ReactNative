@@ -18,11 +18,14 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      const shuffledTasks = _.shuffle(data.tasks);
-      shuffledTasks.forEach((taks: any) => {
-        taks.answer = _.shuffle(taks.answer);
-      })
+  
+      console.log('Fetched test details:', data); // Logowanie szczegółów testu
+      const shuffledTasks = _.shuffle(data.tasks || []); // Upewnij się, że tasks istnieje
+      shuffledTasks.forEach((task: any) => {
+        task.answers = _.shuffle(task.answers || []); // Upewnij się, że answers istnieje
+      });
       data.tasks = shuffledTasks;
+  
       setTestDetails(data);
     } catch (error) {
       console.error('Error fetching test details:', error);
@@ -30,6 +33,7 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     getQuestionIDFromAPI();
