@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  ImageBackground,
+  Animated,
+} from 'react-native';
 import _ from 'lodash';
 
 const TestQuestionScreen = ({ route, navigation }: any) => {
@@ -9,8 +17,11 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const timerRef = useRef<any>(null);
 
-  
+  const animatedValue = useRef(new Animated.Value(1)).current;
+
   const getQuestionIDFromAPI = async () => {
     try {
       const response = await fetch(`https://tgryl.pl/quiz/test/${testId}`);
@@ -18,14 +29,13 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-  
-      console.log('Fetched test details:', data); // Logowanie szczegółów testu
-      const shuffledTasks = _.shuffle(data.tasks || []); // Upewnij się, że tasks istnieje
+
+      const shuffledTasks = _.shuffle(data.tasks || []);
       shuffledTasks.forEach((task: any) => {
-        task.answers = _.shuffle(task.answers || []); // Upewnij się, że answers istnieje
+        task.answers = _.shuffle(task.answers || []);
       });
       data.tasks = shuffledTasks;
-  
+
       setTestDetails(data);
     } catch (error) {
       console.error('Error fetching test details:', error);
@@ -33,15 +43,65 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     getQuestionIDFromAPI();
   }, [testId]);
 
+  useEffect(() => {
+    if (timeLeft > 0) {
+      timerRef.current = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    } else {
+      handleTimeout();
+    }
+    return () => clearTimeout(timerRef.current);
+  }, [timeLeft]);
+
+  const startAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(animatedValue, {
+          toValue: 1.1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animatedValue, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  const getProgressBarColor = () => {
+    if (timeLeft > 19) {
+      return 'green';
+    } else if (timeLeft > 9) {
+      return 'orange';
+    } else {
+      return 'red';
+    }
+  };
+
+  const handleTimeout = () => {
+    if (selectedAnswerIndex === null) {
+      if (currentIndex < testDetails.tasks.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        setSelectedAnswerIndex(null);
+        setTimeLeft(30);
+      } else {
+        sendResults(score, testDetails.tasks.length);
+      }
+    }
+  };
+
   const sendResults = async (score: number, total: number) => {
     const payload = {
-      nick: "Karol", score, total, type: testDetails.name,
+      nick: 'Karol',
+      score,
+      total,
+      type: testDetails.name,
     };
     try {
       const response = await fetch('https://tgryl.pl/quiz/result', {
@@ -53,38 +113,33 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
       });
 
       if (response.ok) {
-        Alert.alert('Sukces', 'Wynik został pomyślnie przesłany!');
-        navigation.navigate("Main", { screen: "Result" });
+        navigation.navigate('Main', { screen: 'Result' });
       } else {
-        Alert.alert('Błąd', 'Nie udało się przesłać wyniku.');
+        console.error('Nie udało się przesłać wyniku');
+        navigation.navigate('Main', { screen: 'Result' });
       }
-    } catch (error: any) {
-      Alert.alert('Błąd', 'Wystąpił problem z przesłaniem wyniku: ', error);
+    } catch (error) {
+      console.error('Wystąpił problem z przesłaniem wyniku: ', error);
+      navigation.navigate('Main', { screen: 'Result' });
     }
-  }
+  };
 
   const handleAnswer = (index: number, isCorrect: boolean) => {
     setSelectedAnswerIndex(index);
-    if(isCorrect) {
+    if (isCorrect) {
       setScore(score + 1);
     }
 
+    clearTimeout(timerRef.current);
+
     setTimeout(() => {
-      if (currentIndex < (testDetails.tasks.length - 1)) {
+      if (currentIndex < testDetails.tasks.length - 1) {
         setCurrentIndex(currentIndex + 1);
         setSelectedAnswerIndex(null);
+        setTimeLeft(30);
       } else {
-        const finalScore = isCorrect ? score + 1: score;
-        Alert.alert(
-          'Koniec quizu!',
-          `Twój wynik to ${finalScore}/${testDetails.tasks.length}.`,
-          [
-            {
-              text: 'OK',
-              onPress: () => sendResults(finalScore, testDetails.tasks.length),
-            },
-          ]
-        );
+        const finalScore = isCorrect ? score + 1 : score;
+        sendResults(finalScore, testDetails.tasks.length);
       }
     }, 1000);
   };
@@ -109,52 +164,86 @@ const TestQuestionScreen = ({ route, navigation }: any) => {
   const currentQuestion = testDetails.tasks[currentIndex];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{testDetails.name}</Text>
-      <Text style={styles.questionNumber}>
-        Pytanie {currentIndex + 1}/{testDetails.tasks.length}
-      </Text>
-      <Text style={styles.question}>{currentQuestion.question}</Text>
+    <ImageBackground source={require('../assets/background.png')} style={styles.background}>
+      <View style={styles.container}>
+        <Animated.Text style={[styles.title, { transform: [{ scale: animatedValue }] }]}>
+          {testDetails.name}
+        </Animated.Text>
+        <View style={styles.progressBarContainer}>
+          <View
+            style={[
+              styles.progressBar,
+              {
+                width: `${(timeLeft / 30) * 100}%`,
+                backgroundColor: getProgressBarColor(),
+              },
+            ]}
+          />
+        </View>
+        <Text style={styles.questionNumber}>
+          Pytanie {currentIndex + 1}/{testDetails.tasks.length} | Czas: {timeLeft}s
+        </Text>
+        <Text style={styles.question}>{currentQuestion.question}</Text>
 
-      {currentQuestion.answers.map((answer: any, index: number) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.answerButton,
-            selectedAnswerIndex === index &&
-              (answer.isCorrect ? styles.correctAnswer : styles.wrongAnswer),
-          ]}
-          onPress={() => handleAnswer(index, answer.isCorrect)}
-          disabled={selectedAnswerIndex !== null}
-        >
-          <Text style={styles.answerText}>{answer.content}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
+        {currentQuestion.answers.map((answer: any, index: number) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.answerButton,
+              selectedAnswerIndex === index &&
+                (answer.isCorrect ? styles.correctAnswer : styles.wrongAnswer),
+            ]}
+            onPress={() => handleAnswer(index, answer.isCorrect)}
+            disabled={selectedAnswerIndex !== null}
+          >
+            <Text style={styles.answerText}>{answer.content}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f4f4f9',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  progressBarContainer: {
+    height: 10,
+    width: '100%',
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginVertical: 10,
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 5,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#fff',
   },
   questionNumber: {
     fontSize: 18,
     marginBottom: 20,
+    color: '#fff',
   },
   question: {
     fontSize: 20,
     textAlign: 'center',
     marginBottom: 20,
+    color: '#fff',
   },
   answerButton: {
     backgroundColor: '#ddd',
@@ -173,12 +262,6 @@ const styles = StyleSheet.create({
   },
   wrongAnswer: {
     backgroundColor: 'red',
-  },
-  score: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 20,
-    color: '#333',
   },
 });
 

@@ -3,9 +3,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import SplashScreen from 'react-native-splash-screen';
-import { initializeDatabase } from './database';
-import { fetchAndStoreTests } from './fetchAndStoreTest';
+import { initializeDatabase, loadOfflineTests, loadTestsFromDatabase } from './src/database';
+import { fetchAndStoreTests } from './src/fetchAndStoreTest';
 import HomeScreen from './screens/HomeScreen';
 import TestScreen from './screens/TestScreen';
 import ResultScreen from './screens/ResultScreen';
@@ -35,10 +36,22 @@ const App = () => {
   useEffect(() => {
     const initApp = async () => {
       try {
-        await AsyncStorage.removeItem('lastFetchDate'); // Wymuś ponowne pobranie
         await initializeDatabase();
-        await fetchAndStoreTests();
-        console.log('App initialization completed.');
+        const netInfo = await NetInfo.fetch();
+        let tests = [];
+
+        if (netInfo.isConnected) {
+          console.log('Connected to the internet. Fetching data...');
+          await fetchAndStoreTests();
+          tests = await loadTestsFromDatabase();
+          await AsyncStorage.removeItem('offlineDataLoaded');
+        } else {
+          console.log('No internet connection. Loading offline data...');
+          tests = await loadOfflineTests();
+          await AsyncStorage.setItem('offlineDataLoaded', 'true');
+        }
+
+        console.log('Tests available in app:', tests);
         const accepted = await AsyncStorage.getItem('hasAccept');
         if (accepted === 'true') {
           setAccept(true);

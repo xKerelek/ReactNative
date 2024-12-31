@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Animated } from 'react-native';
 
 const ResultScreen = () => {
   const navigation = useNavigation();
@@ -8,6 +8,8 @@ const ResultScreen = () => {
   const [results, setResults] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+
+  const animatedValue = useRef(new Animated.Value(1)).current;
 
   const getPlayerFromAPI = async () => {
     try {
@@ -24,7 +26,25 @@ const ResultScreen = () => {
 
   useEffect(() => {
     getPlayerFromAPI();
+    startAnimation();
   }, []);
+
+  const startAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(animatedValue, {
+          toValue: 1.1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animatedValue, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -42,7 +62,7 @@ const ResultScreen = () => {
         <Text style={styles.cell}>{item.nick}</Text>
         <Text style={styles.cell}>{item.score}</Text>
         <Text style={styles.cell}>{item.total}</Text>
-        <Text style={styles.cell}>{item.type}</Text>
+        <Text style={[styles.cell, styles.typeCell]}>{item.type}</Text>
       </TouchableOpacity>
       {selectedPlayerId === item.id && (
         <View style={styles.detailRow}>
@@ -53,16 +73,18 @@ const ResultScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Wyniki graczy</Text>
-      <ScrollView horizontal>
-        <View>
+    <ImageBackground source={require('../assets/background.png')} style={styles.background}>
+      <View style={styles.container}>
+        <Animated.Text style={[styles.title, { transform: [{ scale: animatedValue }] }]}>
+          Wyniki graczy
+        </Animated.Text>
+        <View style={styles.tableContainer}>
           <View style={styles.header}>
             <Text style={styles.headerText}>#</Text>
             <Text style={styles.headerText}>Player</Text>
             <Text style={styles.headerText}>Points</Text>
             <Text style={styles.headerText}>Score</Text>
-            <Text style={styles.headerText}>Type</Text>
+            <Text style={[styles.headerText, styles.typeHeader]}>Type</Text>
           </View>
           <FlatList
             data={results}
@@ -72,29 +94,37 @@ const ResultScreen = () => {
             onRefresh={onRefresh}
           />
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f4f4f9',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    color: '#fff',
+  },
+  tableContainer: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     backgroundColor: '#7C7372',
     paddingVertical: 10,
     marginBottom: 10,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
   },
   headerText: {
     color: 'white',
@@ -102,6 +132,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minWidth: 70,
     textAlign: 'center',
+  },
+  typeHeader: {
+    flex: 1,
+    textAlign: 'left',
   },
   row: {
     flexDirection: 'row',
@@ -113,18 +147,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minWidth: 70,
     textAlign: 'center',
+    color: '#fff',
+  },
+  typeCell: {
+    flex: 1,
+    textAlign: 'left',
+    flexWrap: 'wrap', 
   },
   detailRow: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#5e5a59',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   detailText: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: 'NunitoSans',
-    color: '#555',
+    color: 'white',
+    textAlign: 'center',
   },
 });
 
